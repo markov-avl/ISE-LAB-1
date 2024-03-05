@@ -1,8 +1,8 @@
 import * as d3 from 'd3'
 import {DSVParsedArray, sort} from "d3";
 import {IData} from "./IData";
-import {IOrder} from "./IOrder";
-import {groupByField, sortByFields} from "./utils";
+import {ISortParam} from "./ISortParam";
+import {groupByField, sortWithParams} from "./utils";
 
 const FILTERED_FIELDS = ['store', 'date', 'holiday']
 const SORTED_FIELDS = ['weeklySales', 'fuelPrice', 'cpi', 'unemployment']
@@ -161,17 +161,17 @@ const initSortersHtml = () => {
 }
 
 const sortData = (data: IData[]): IData[] => {
-    const orders = Array.from(document.getElementById('sorters').children)
+    const sortParams = Array.from(document.getElementById('sorters').children)
         .filter((sorter: Element): boolean => {
             return sorter.id && !(document.getElementById(sorter.id + 'NS') as HTMLInputElement).checked
         })
-        .map((sorter: Element): IOrder => {
+        .map((sorter: Element): ISortParam => {
             return {
-                name: sorter.id.replace(SORTER, ''),
+                by: sorter.id.replace(SORTER, ''),
                 ascending: (document.getElementById(sorter.id + 'Asc') as HTMLInputElement).checked
             }
         })
-    return sortByFields(data, orders)
+    return sortWithParams(data, sortParams)
 }
 
 // main
