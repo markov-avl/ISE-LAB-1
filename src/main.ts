@@ -2,35 +2,17 @@ import * as d3 from 'd3'
 import {DSVParsedArray, sort} from "d3";
 import {IData} from "./IData";
 import {ISortParam} from "./ISortParam";
-import {groupByField, sortWithParams} from "./utils";
+import {filterBy, getFilterId, getFilterName, groupByField, sortWithParams} from "./utils";
+import {toDataTableRow, toFilterSelect, toSorterForm} from "./html";
+import {DATA_PATH, FIELDS_TO_FILTER, FIELDS_TO_SORT, SORTER_ID_SUFFIX} from "./constants";
 
-const FILTERED_FIELDS = ['store', 'date', 'holiday']
-const SORTED_FIELDS = ['weeklySales', 'fuelPrice', 'cpi', 'unemployment']
-const FILTER = 'Filter'
-const SORTER = 'Sorter'
-const DATA_PATH = './res/sales.csv'
-
-// utils
-
-
-const toHtmlTableRow = (row: IData): string =>
-    `<tr>
-        <td>${row.store}</td>
-        <td>${row.date}</td>
-        <td>${row.weeklySales}</td>
-        <td>${row.holiday}</td>
-        <td>${row.temperature}</td>
-        <td>${row.fuelPrice}</td>
-        <td>${row.cpi}</td>
-        <td>${row.unemployment}</td>
-    </tr>`
 
 const fillTable = (data: IData[]) => {
     d3.select('#content tbody')
         .selectAll('tr')
         .data(data)
         .join('tr')
-        .html((row: IData) => toHtmlTableRow(row))
+        .html((row: IData) => toDataTableRow(row))
 }
 
 const makeSortersMovable = () => {
@@ -57,19 +39,15 @@ const buildButtonCallback = () => {
     const filters = getAllFilters()
     let resultData = Array.from(data)
 
-    for (const filter of filters) {
-        let selectedOptions = []
-        for (const option of filter.options) {
-            if (option.selected) {
-                selectedOptions.push(option.value)
-            }
+    filters.forEach(filterSelect => {
+        const values = Array.from(filterSelect.options)
+            .filter(option => option.selected)
+            .map(option => option.value)
+        if (values.length) {
+            const filterName = getFilterName(filterSelect.id)
+            resultData = filterBy(resultData, filterName, values)
         }
-        if (selectedOptions.length > 0) {
-            resultData = resultData.filter(
-                item => selectedOptions.includes(item[filter.id.replace(FILTER, '')]))
-        }
-    }
-    console.log(resultData)
+    })
 
     fillTable(sortData(resultData))
 }
@@ -91,14 +69,6 @@ const getData = async (): Promise<DSVParsedArray<IData>> => await d3.csv<IData>(
     }
 })
 
-// filters
-const initFilterHtml = filterName => {
-    const filterId = filterName + FILTER
-    return `<div style="display: flex; flex-direction: column">
-                    <p>${filterName}</p>
-                    <select name="${filterName}" id="${filterId}" multiple size="20"></select>
-                </div>`
-}
 
 const initFiltersHtml = () => {
     const filtersDiv = document.getElementById('filters')
@@ -106,23 +76,19 @@ const initFiltersHtml = () => {
     filtersDiv.innerHTML += `<div style="display: flex"></div>`
 
     const filterSelects = filtersDiv.children.item(1)
-    FILTERED_FIELDS.forEach(filteredFieldName => {
-        filterSelects.innerHTML += initFilterHtml(filteredFieldName)
+    FIELDS_TO_FILTER.forEach(filteredFieldName => {
+        filterSelects.innerHTML += toFilterSelect(filteredFieldName)
     })
 }
 
 
-const getAllFilters = () => {
-    let filters = []
-    for (const filterName of FILTERED_FIELDS) {
-        const filter = document.getElementById(filterName + FILTER)
-        filters.push(filter)
-    }
-    return filters
+const getAllFilters = (): HTMLSelectElement[] => {
+    return FIELDS_TO_FILTER
+        .map(filterName => document.getElementById(getFilterId(filterName)) as HTMLSelectElement)
 }
 
-const fillFilter = (data, filterId) => {
-    d3.select('#' + filterId + FILTER)
+const fillFilter = (data: IData[], filterName: string) => {
+    d3.select('#' + getFilterId(filterName))
         .selectAll('option')
         .data(data)
         .join('option')
@@ -130,33 +96,18 @@ const fillFilter = (data, filterId) => {
 }
 
 const fillAllFilters = (data: IData[]): void => {
-    FILTERED_FIELDS.forEach(filterName => {
+    FIELDS_TO_FILTER.forEach(filterName => {
         const keys = sort(groupByField(data, filterName).keys())
         fillFilter(keys, filterName)
     })
 }
 
-// sorts
-const initSorterHtml = (sorterName: string): string => {
-    const sorterId = sorterName + SORTER
-    return `<div id="${sorterId}">
-              <button class="up-button">↑</button>
-              <button class="down-button">↓</button>
-              <span>Sort by ${sorterName}</span>
-              <input type="radio" id="${sorterId}Asc" name="${sorterName}" value="${sorterName}"/>
-              <label for="${sorterId}Asc">Asc</label>
-              <input type="radio" id="${sorterId}Desc" name="${sorterName}" value="${sorterName}" />
-              <label for="${sorterId}Desc">Desc</label>
-              <input type="radio" id="${sorterId}NS" name="${sorterName}" value="${sorterName}" checked/>
-              <label for="${sorterId}NS">NS</label>
-            </div>`
-}
 
 const initSortersHtml = () => {
     const sortsDiv = document.getElementById('sorters')
     sortsDiv.innerHTML += `<h2>Sorters</h2>`
-    SORTED_FIELDS.forEach(sortedFieldName => {
-        sortsDiv.innerHTML += initSorterHtml(sortedFieldName)
+    FIELDS_TO_SORT.forEach(sortedFieldName => {
+        sortsDiv.innerHTML += toSorterForm(sortedFieldName)
     })
 }
 
@@ -167,7 +118,7 @@ const sortData = (data: IData[]): IData[] => {
         })
         .map((sorter: Element): ISortParam => {
             return {
-                by: sorter.id.replace(SORTER, ''),
+                by: sorter.id.replace(SORTER_ID_SUFFIX, ''),
                 ascending: (document.getElementById(sorter.id + 'Asc') as HTMLInputElement).checked
             }
         })
