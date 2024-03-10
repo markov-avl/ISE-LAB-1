@@ -2,12 +2,13 @@ import * as d3 from "d3";
 import {ISortParam} from "./ISortParam";
 import {FILTER_ID_SUFFIX, SORTER_ID_SUFFIX} from "./constants";
 
-export const groupByField = <T>(data: T[], fieldName: string) => d3.group(data, (item: T) => item[fieldName])
+export const groupBy = <T>(data: T[], fieldName: string) =>
+    d3.group(data, (item: T) => item[fieldName])
 
-export const filterBy = <T>(data: T[], fieldName: string, values: string[]) => d3.filter(data, (item: T) =>
-    values.includes(item[fieldName].toString()))
+export const filterBy = <T>(data: T[], fieldName: string, values: string[]) =>
+    d3.filter(data, (item: T) => values.includes(item[fieldName].toString()))
 
-export const sortWithParams = <T>(data: T[], sortParams: ISortParam[]) => {
+export const sortBy = <T>(data: T[], sortParams: ISortParam[]) => {
     if (!sortParams.length) {
         return data
     }
