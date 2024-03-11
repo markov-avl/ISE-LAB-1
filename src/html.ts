@@ -1,4 +1,4 @@
-import {IData} from "./IData";
+import {IData} from "./interface/IData";
 import {getFilterId, getSorterId} from "./utils";
 
 export const toDataTableRow = (row: IData): string =>

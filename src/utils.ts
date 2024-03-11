@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import {ISortParam} from "./ISortParam";
+import {ISortParam} from "./interface/ISortParam";
 import {FILTER_ID_SUFFIX, SORTER_ID_SUFFIX} from "./constants";
 
 export const groupBy = <T>(data: T[], fieldName: string) =>

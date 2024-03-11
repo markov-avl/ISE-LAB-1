@@ -1,10 +1,10 @@
 import * as d3 from 'd3'
 import {DSVParsedArray} from "d3";
-import {IData} from "./IData";
+import {IData} from "./interface/IData";
 import {toDataTableRow} from "./html";
 import {DATA_PATH} from "./constants";
-import {initFiltersHtml, fillAllFilters, filterData} from "./filtering";
-import {initSortersHtml, makeSortersMovable, sortData} from "./sorting";
+import {initFiltersHtml, fillAllFilters, resetFiltersHtml, filterData} from "./filtering";
+import {initSortersHtml, makeSortersMovable, resetSortersHtml, sortData} from "./sorting";
 
 
 const fillTable = (data: IData[]) => {
@@ -12,17 +12,23 @@ const fillTable = (data: IData[]) => {
         .selectAll('tr')
         .data(data)
         .join('tr')
-        .html((row: IData) => toDataTableRow(row))
+        .html(row => toDataTableRow(row))
 }
 
-const useOptionsCallback = () => {
-    const result = Array.of<(_: IData[]) => IData[]>(Array.from, filterData, sortData)
-        .reduce((previous, next) => next(previous), data)
-    fillTable(result)
+const makeClearOptionsButton = () => {
+    document.getElementById('clearOptions').addEventListener('click', () => {
+        resetFiltersHtml()
+        resetSortersHtml()
+        fillTable(data)
+    })
 }
 
 const makeUseOptionsButton = () => {
-    document.getElementById('useOptions').addEventListener('click', useOptionsCallback)
+    document.getElementById('useOptions').addEventListener('click', () => {
+        const result = Array.of<(_: IData[]) => IData[]>(Array.from, filterData, sortData)
+            .reduce((previous, next) => next(previous), data)
+        fillTable(result)
+    })
 }
 
 const getData = async (): Promise<DSVParsedArray<IData>> => await d3.csv<IData>(DATA_PATH, res => {
@@ -47,6 +53,6 @@ fillAllFilters(data)
 initSortersHtml()
 makeSortersMovable()
 
-fillTable(data)
+makeClearOptionsButton()
 makeUseOptionsButton()
-useOptionsCallback()
+fillTable(data)

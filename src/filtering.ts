@@ -1,18 +1,20 @@
-import {IData} from "./IData";
-import {filterBy, getFilterId, getFilterName, groupBy} from "./utils";
+import * as d3 from "d3";
+import {IData} from "./interface/IData";
 import {FIELDS_TO_FILTER} from "./constants";
 import {toFilterSelect} from "./html";
-import * as d3 from "d3";
+import {filterBy, getFilterId, getFilterName, groupBy} from "./utils";
 
 
 export const initFiltersHtml = () => {
-    const filters = document.getElementById('filters')
-    filters.innerHTML += `<h2>Filters</h2>`
-    filters.innerHTML += `<div style="display: flex"></div>`
-
-    const filterSelects = filters.children.item(1)
+    const filters = document.getElementById('filters').children.item(1)
     FIELDS_TO_FILTER.forEach(filterName => {
-        filterSelects.innerHTML += toFilterSelect(filterName)
+        filters.innerHTML += toFilterSelect(filterName)
+    })
+}
+
+export const resetFiltersHtml = () => {
+    FIELDS_TO_FILTER.forEach(filterName => {
+        (document.getElementById(getFilterId(filterName)) as HTMLSelectElement).selectedIndex = -1
     })
 }
 
@@ -29,7 +31,8 @@ export const fillAllFilters = (data: IData[]): void => {
 
 export const filterData = (data: IData[]): IData[] => {
     FIELDS_TO_FILTER
-        .map(filterName => document.getElementById(getFilterId(filterName)) as HTMLSelectElement)
+        .map(filterName => getFilterId(filterName))
+        .map(filterId => document.getElementById(filterId) as HTMLSelectElement)
         .forEach(filterSelect => {
             const values = Array.from(filterSelect.options)
                 .filter(option => option.selected)

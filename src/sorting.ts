@@ -1,15 +1,19 @@
 import {FIELDS_TO_SORT} from "./constants";
 import {toSorterForm} from "./html";
-import {IData} from "./IData";
-import {ISortParam} from "./ISortParam";
-import {getSorterName, sortBy} from "./utils";
+import {IData} from "./interface/IData";
+import {ISortParam} from "./interface/ISortParam";
+import {getSorterId, getSorterName, sortBy} from "./utils";
 
 export const initSortersHtml = () => {
     const sorters = document.getElementById('sorters')
-    sorters.innerHTML += `<h2>Sorters</h2>`
+    FIELDS_TO_SORT.forEach(sorterName => {
+        sorters.innerHTML += toSorterForm(sorterName)
+    })
+}
 
-    FIELDS_TO_SORT.forEach(sortedFieldName => {
-        sorters.innerHTML += toSorterForm(sortedFieldName)
+export const resetSortersHtml = () => {
+    FIELDS_TO_SORT.forEach(sorterName => {
+        (document.getElementById(getSorterId(sorterName) + 'NS') as HTMLInputElement).checked = true
     })
 }
 
@@ -18,9 +22,9 @@ export const makeSortersMovable = () => {
         const target = e.target as HTMLElement
         if (target.tagName === "BUTTON") {
             const selectedItem = target.parentNode
-            if (target.classList.contains("up-button") && selectedItem.previousSibling) {
+            if (target.classList.contains("up-button") && selectedItem.previousSibling instanceof HTMLDivElement) {
                 selectedItem.parentNode.insertBefore(selectedItem, selectedItem.previousSibling)
-            } else if (target.classList.contains("down-button") && selectedItem.nextSibling) {
+            } else if (target.classList.contains("down-button") && selectedItem.nextSibling instanceof HTMLDivElement) {
                 selectedItem.parentNode.insertBefore(selectedItem.nextSibling, selectedItem)
             }
         }
