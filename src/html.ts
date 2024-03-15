@@ -13,7 +13,7 @@ export const toDataTableRow = (row: IData): string =>
         <td>${row.unemployment}</td>
     </tr>`
 
-export const toFilterSelect = (filterName: string): string => {
+export const toFilterSelect = (filterName: keyof IData): string => {
     const filterId = getFilterId(filterName)
     return `<div style="display: flex; flex-direction: column">
                 <p>${filterName}</p>
@@ -21,7 +21,7 @@ export const toFilterSelect = (filterName: string): string => {
             </div>`
 }
 
-export const toSorterForm = (sorterName: string): string => {
+export const toSorterForm = (sorterName: keyof IData): string => {
     const sorterId = getSorterId(sorterName)
     return `<div id="${sorterId}">
                 <button class="up-button">↑</button>

@@ -34,7 +34,7 @@ export const makeSortersMovable = () => {
 export const sortData = (data: IData[]): IData[] => {
     const sortParams = Array.from(document.getElementById('sorters').children)
         .filter(sorter => sorter.id && !(document.getElementById(sorter.id + 'NS') as HTMLInputElement).checked)
-        .map((sorter: Element): ISortParam => {
+        .map((sorter: Element): ISortParam<IData> => {
             return {
                 by: getSorterName(sorter.id),
                 ascending: (document.getElementById(sorter.id + 'Asc') as HTMLInputElement).checked

@@ -20,7 +20,8 @@ export const resetFiltersHtml = () => {
 
 export const fillAllFilters = (data: IData[]): void => {
     FIELDS_TO_FILTER.forEach(filterName => {
-        const keys = d3.sort(groupBy(data, filterName).keys())
+        const groups = groupBy(data, {by: row => row[filterName]})
+        const keys = d3.sort(groups.keys())
         d3.select('#' + getFilterId(filterName))
             .selectAll('option')
             .data(keys)

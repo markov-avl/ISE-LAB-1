@@ -3,10 +3,13 @@ const path = require("path");
 
 module.exports = {
     mode: "development",
-    entry: ['./src/main.ts'],
+    entry: {
+        parameterization: './src/parameterization.ts',
+        graph: './src/graph.ts'
+    },
     output: {
         path: path.join(__dirname, "/dist"),
-        filename: "bundle.js"
+        filename: "[name].js"
     },
     module: {
         rules: [

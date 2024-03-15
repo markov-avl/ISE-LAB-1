@@ -1,4 +1,4 @@
-export interface ISortParam {
-    by: string
+export interface ISortParam<T> {
+    by: keyof T
     ascending: boolean
 }

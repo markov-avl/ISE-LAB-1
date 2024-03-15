@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3 Dynamic Diagram</title>
+</head>
+<body>
+<div id="graph"></div>
+<div style="display: flex; flex-direction: row; gap: 50px">
+    <div>
+        <label>Group by:</label><br>
+        <input type="radio" id="groupDay" name="dateGroup" value="DAY" checked>
+        <label for="groupDay">Day</label><br>
+        <input type="radio" id="groupMonth" name="dateGroup" value="MONTH">
+        <label for="groupMonth">Month</label><br>
+    </div>
+    <div>
+        <label>Data type:</label><br>
+        <input type="radio" id="weeklySales" name="dataType" value="weeklySales" checked>
+        <label for="weeklySales">Weekly Sales</label><br>
+        <input type="radio" id="fuelPrice" name="dataType" value="fuelPrice">
+        <label for="fuelPrice">Fuel Price</label><br>
+    </div>
+    <div>
+        <label>Aggregation:</label><br>
+        <input type="radio" id="min" name="aggregation" value="MIN" checked>
+        <label for="min">Min</label><br>
+        <input type="radio" id="max" name="aggregation" value="MAX">
+        <label for="max">Max</label><br>
+        <input type="radio" id="mean" name="aggregation" value="MEAN">
+        <label for="mean">Mean</label><br>
+    </div>
+</div>
+<button id="updateGraph">Update graph</button>
+<script src="dist/graph.js"></script>
+</body>
+</html>
