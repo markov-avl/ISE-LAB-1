@@ -32,7 +32,6 @@ const makeParametrizeButton = () => {
 
 const data = await getData()
 
-
 initFiltersHtml()
 fillAllFilters(data)
 
